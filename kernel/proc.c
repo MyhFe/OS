@@ -154,24 +154,40 @@ scheduler(void)
     
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
+    struct proc *tmp = &proc[0];
     for(p = proc; p < &proc[NPROC]; p++) {
-      if ((finish<ticks) | (p->pid==proc[0].pid) | (p->pid==proc[1].pid)){
-        acquire(&p->lock);
-        if(p->state == RUNNABLE) {
-          // Switch to chosen process.  It is the process's job
-          // to release its lock and then reacquire it
-          // before jumping back to us.
-          p->state = RUNNING;
-          
-          c->proc = p;
-          swtch(&c->context, &p->context);
-          // Process is done running for now.
-          // It should have changed its p->state before coming back.
-          c->proc = 0;
-        }
-        release(&p->lock);
+      if ((p->mean_ticks < tmp->mean_ticks)){
+         tmp = p;
       }
     }
+    p = tmp;
+    // printf("mean_ticks of p0: %d\n", proc[0].mean_ticks);
+    // printf("mean_ticks of p1: %d\n", proc[1].mean_ticks);
+    if ((finish<ticks) | (p->pid==proc[0].pid) | (p->pid==proc[1].pid)){
+      acquire(&p->lock);
+      // printf("ticks1 %d\n",ticks);
+      if(p->state == RUNNABLE) {
+        // Switch to chosen process.  It is the process's job
+        // to release its lock and then reacquire it
+        // before jumping back to us.
+        p->state = RUNNING;
+        p->last_ticks = ticks;
+        //printf("last ticks 1: %d\n",p->last_ticks);
+        c->proc = p;
+        swtch(&c->context, &p->context);
+        p->last_ticks =  ticks - p->last_ticks;
+        printf("ticks2 %d\n",ticks);
+
+       // printf("last ticks 2: %d\n",p->last_ticks);
+       
+        p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&p->lock);
+    }
+    
   }
 }
 #endif
