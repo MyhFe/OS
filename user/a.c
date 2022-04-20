@@ -8,6 +8,27 @@
 #include "kernel/memlayout.h"
 #include "kernel/riscv.h"
 
+void check(){
+    int n_forks = 4;
+    int pid;
+    int k=0;
+    for (int i = 0; i < n_forks; i++) {
+    	pid = fork();
+        if (pid == 0) {
+        
+            k = i;
+            break;
+        }
+    }
+    
+    if (pid==0) {
+        while(1){
+            printf("this is process %d\n", k);
+            sleep(15);
+        }
+    }
+}
+
 void kill_system_dem(int interval, int loop_size) {
     int pid = getpid();
     for (int i = 0; i < loop_size; i++) {
@@ -37,7 +58,10 @@ void pause_system_dem(int interval, int pause_seconds, int loop_size) {
 int
 main(int argc, char *argv[])
 {
+    //check();
     pause_system_dem(10, 4, 100);
+    print_stats();
     //kill_system_dem(10, 100);
+
     exit(0);
 }

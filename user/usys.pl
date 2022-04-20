@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("kill_sys");
 entry("pause_sys");
+entry("print_stats");
