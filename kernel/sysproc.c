@@ -38,6 +38,12 @@ sys_wait(void)
   return wait(p);
 }
 
+void
+sys_print_stats(void)
+{
+  return print_stats();
+}
+
 uint64
 sys_sbrk(void)
 {
