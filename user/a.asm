@@ -227,10 +227,11 @@ main(int argc, char *argv[])
  192:	4529                	li	a0,10
  194:	00000097          	auipc	ra,0x0
  198:	f50080e7          	jalr	-176(ra) # e4 <pause_system_dem>
+    //kill_system_dem(10, 100);
     print_stats();
  19c:	00000097          	auipc	ra,0x0
  1a0:	338080e7          	jalr	824(ra) # 4d4 <print_stats>
-    //kill_system_dem(10, 100);
+
 
     exit(0);
  1a4:	4501                	li	a0,0

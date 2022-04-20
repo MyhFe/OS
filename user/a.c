@@ -60,8 +60,9 @@ main(int argc, char *argv[])
 {
     //check();
     pause_system_dem(10, 4, 100);
-    print_stats();
     //kill_system_dem(10, 100);
+    print_stats();
+
 
     exit(0);
 }

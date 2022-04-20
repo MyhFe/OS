@@ -65,6 +65,8 @@ kill(int pid)
       if(p->state == SLEEPING){
         // Wake process from sleep().
         p->state = RUNNABLE;
+        p->last_runnable_time = ticks;
+
       }
       release(&p->lock);
       return 0;
@@ -87,6 +89,7 @@ kill_sys(void)
       if(p->state == SLEEPING){
         // Wake process from sleep().
         p->state = RUNNABLE;
+        p->last_runnable_time = ticks;
       }
       //release(&p->lock);
     }
@@ -106,7 +109,7 @@ pause_sys(int secs)
 
 void
 print_stats(void){
-  printf("cpu_utilization: %d\n", cpu_utilization);
+  printf("cpu_utilization: %d \% \n", cpu_utilization);
   printf("program_time: %d\n", program_time);
   printf("sleeping_processes_mean: %d\n", sleeping_processes_mean);
   printf("running_processes_mean: %d\n", running_processes_mean);
@@ -146,11 +149,11 @@ scheduler(void)
           int before_switch = ticks;
           c->proc = p;
           if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-            p->running_time = p->runnable_time + ticks - p->last_runnable_time;
+            p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
           }
           swtch(&c->context, &p->context);
           if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-            p->runnable_time = p->running_time + ticks - before_switch;
+            p->running_time = p->running_time + ticks - before_switch;
           }
           // Process is done running for now.
           // It should have changed its p->state before coming back.
@@ -194,16 +197,15 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
 
-        p->last_ticks = ticks;
         p->running_time = ticks;
         c->proc = p;
         int ticks_now = ticks;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->running_time = p->runnable_time + ticks - p->last_runnable_time;
+          p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
         }
         swtch(&c->context, &p->context);
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->runnable_time = p->running_time + ticks - ticks_now;
+          p->running_time = p->running_time + ticks - ticks_now;
         }
         p->last_ticks =  ticks - ticks_now;
         p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
@@ -252,11 +254,11 @@ scheduler(void)
         int ticks_now = ticks;
         c->proc = p;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->running_time = p->runnable_time + ticks - p->last_runnable_time;
+          p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
         }
         swtch(&c->context, &p->context);
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->runnable_time = p->running_time + ticks - ticks_now;
+          p->running_time = p->running_time + ticks - ticks_now;
         }
         // Process is done running for now.
         // It should have changed its p->state before coming back.
@@ -464,7 +466,7 @@ userinit(void)
   // and data into it.
   uvminit(p->pagetable, initcode, sizeof(initcode));
   p->sz = PGSIZE;
-  p->last_runnable_time = ticks;
+ 
 
   sleeping_processes_mean = 0;
   running_processes_mean = 0;
@@ -478,7 +480,7 @@ userinit(void)
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
-  
+  p->last_runnable_time = ticks;
   release(&p->lock);
 }
 
@@ -547,6 +549,7 @@ fork(void)
   release(&wait_lock);
 
   acquire(&np->lock);
+  np->last_runnable_time = ticks;
   np->state = RUNNABLE;
   release(&np->lock);
 
@@ -601,7 +604,7 @@ exit(int status)
 
   if((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)){
     program_time = program_time + p->running_time;
-    cpu_utilization = program_time/(ticks-start_time);
+    cpu_utilization = (100*program_time)/(ticks-start_time);
   }
   exited = exited + 1;
   // Give any children to init.
@@ -710,6 +713,7 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  p->last_runnable_time = ticks;
   sched();
   release(&p->lock);
 }
@@ -757,7 +761,7 @@ sleep(void *chan, struct spinlock *lk)
   p->state = SLEEPING;
   int sleep_start = ticks;
   sched();
-  p->sleeping_time = p->sleeping_time - sleep_start;
+  p->sleeping_time = ticks - sleep_start;
   // Tidy up.
   p->chan = 0;
 
@@ -778,6 +782,8 @@ wakeup(void *chan)
       acquire(&p->lock);
       if(p->state == SLEEPING && p->chan == chan) {
         p->state = RUNNABLE;
+        p->last_runnable_time = ticks;
+
       }
       release(&p->lock);
     }
