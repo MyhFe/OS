@@ -94,6 +94,11 @@ struct proc {
   int pid;                     // Process ID
   int mean_ticks;
   int last_ticks;
+  int last_runnable_time;
+  int sleeping_time;
+  int runnable_time;
+  int running_time;
+  
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
 
