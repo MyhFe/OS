@@ -74,11 +74,13 @@ usertrap(void)
   }
 
   if(p->killed)
-    exit(-1);
-
+    exit(-1); 
+    
+  #ifdef DEFAULT
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
     yield();
+  #endif
 
   usertrapret();
 }
