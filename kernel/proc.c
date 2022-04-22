@@ -196,8 +196,6 @@ scheduler(void)
         // to release its lock and then reacquire it
         // before jumping back to us.
         p->state = RUNNING;
-
-        p->running_time = ticks;
         c->proc = p;
         int ticks_now = ticks;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
@@ -209,6 +207,7 @@ scheduler(void)
         }
         p->last_ticks =  ticks - ticks_now;
         p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
+
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
@@ -250,7 +249,6 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         p->last_ticks = ticks;
-        p->running_time = ticks;
         int ticks_now = ticks;
         c->proc = p;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
@@ -258,7 +256,9 @@ scheduler(void)
         }
         swtch(&c->context, &p->context);
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->running_time = p->running_time + ticks - ticks_now;
+          int n =  p->running_time;
+          p->running_time = n + ticks - ticks_now;
+        //  printf("running time: %d\n",n);
         }
         // Process is done running for now.
         // It should have changed its p->state before coming back.
@@ -597,14 +597,13 @@ exit(int status)
   p->cwd = 0;
 
   acquire(&wait_lock);
-  
-  sleeping_processes_mean = ((sleeping_processes_mean*exited) + p->sleeping_time)/exited+1;
-  running_processes_mean = ((running_processes_mean*exited) + p->running_time)/exited+1;
-  runnable_processes_mean = ((runnable_processes_mean*exited) + p->runnable_time)/exited+1;
 
   if((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)){
     program_time = program_time + p->running_time;
     cpu_utilization = (100*program_time)/(ticks-start_time);
+    sleeping_processes_mean = ((sleeping_processes_mean*exited) + p->sleeping_time)/(exited+1);
+    running_processes_mean = ((running_processes_mean*exited) + p->running_time)/(exited+1);
+    runnable_processes_mean = ((runnable_processes_mean*exited) + p->runnable_time)/(exited+1);
   }
   exited = exited + 1;
   // Give any children to init.
