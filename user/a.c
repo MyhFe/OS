@@ -80,14 +80,16 @@ void env(int size, int interval, char* env_name) {
         	}
         }
         if (i % interval == 0) {
-            result = result * size;
+            for(int j=1;j<100;j++){
+                result = result * size;
+            }
         }
     }
     printf("\n");
 }
 
 void env_large() {
-    env(10e6, 10e6, "env_large");
+    env(10e6, 3, "env_large");
 }
 
 void env_freq() {

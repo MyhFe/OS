@@ -205,9 +205,10 @@ scheduler(void)
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
           p->running_time = p->running_time + ticks - ticks_now;
         }
-        p->last_ticks =  ticks - ticks_now;
+        int t = ticks;
+        p->last_ticks =  t - ticks_now;
         p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
-
+        printf("pid: %d start: %d end: %d last: %d mean: %d\n",p->pid,ticks_now,t,p->last_ticks,p->mean_ticks);
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
