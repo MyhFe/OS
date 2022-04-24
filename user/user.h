@@ -23,8 +23,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int kill_sys();
-int pause_sys(int);
+int kill_system();
+int pause_system(int);
 void print_stats(void);
 
 // ulib.c

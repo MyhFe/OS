@@ -78,7 +78,7 @@ kill(int pid)
 
 
 int
-kill_sys(void)
+kill_system(void)
 {
   struct proc *p;
 
@@ -100,7 +100,7 @@ kill_sys(void)
 
 
 int
-pause_sys(int secs)
+pause_system(int secs)
 {
   finish =  ticks + secs*10;
   yield();

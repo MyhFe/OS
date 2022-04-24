@@ -105,14 +105,14 @@ uptime:
  li a7, SYS_uptime
  ecall
  ret
-.global kill_sys
-kill_sys:
- li a7, SYS_kill_sys
+.global kill_system
+kill_system:
+ li a7, SYS_kill_system
  ecall
  ret
-.global pause_sys
-pause_sys:
- li a7, SYS_pause_sys
+.global pause_system
+pause_system:
+ li a7, SYS_pause_system
  ecall
  ret
 .global print_stats

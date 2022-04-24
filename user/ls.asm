@@ -959,20 +959,20 @@ uptime:
  ret
  5e8:	8082                	ret
 
-00000000000005ea <kill_sys>:
-.global kill_sys
-kill_sys:
- li a7, SYS_kill_sys
+00000000000005ea <kill_system>:
+.global kill_system
+kill_system:
+ li a7, SYS_kill_system
  5ea:	48d9                	li	a7,22
  ecall
  5ec:	00000073          	ecall
  ret
  5f0:	8082                	ret
 
-00000000000005f2 <pause_sys>:
-.global pause_sys
-pause_sys:
- li a7, SYS_pause_sys
+00000000000005f2 <pause_system>:
+.global pause_system
+pause_system:
+ li a7, SYS_pause_system
  5f2:	48dd                	li	a7,23
  ecall
  5f4:	00000073          	ecall

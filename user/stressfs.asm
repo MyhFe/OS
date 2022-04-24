@@ -760,20 +760,20 @@ uptime:
  ret
  420:	8082                	ret
 
-0000000000000422 <kill_sys>:
-.global kill_sys
-kill_sys:
- li a7, SYS_kill_sys
+0000000000000422 <kill_system>:
+.global kill_system
+kill_system:
+ li a7, SYS_kill_system
  422:	48d9                	li	a7,22
  ecall
  424:	00000073          	ecall
  ret
  428:	8082                	ret
 
-000000000000042a <pause_sys>:
-.global pause_sys
-pause_sys:
- li a7, SYS_pause_sys
+000000000000042a <pause_system>:
+.global pause_system
+pause_system:
+ li a7, SYS_pause_system
  42a:	48dd                	li	a7,23
  ecall
  42c:	00000073          	ecall

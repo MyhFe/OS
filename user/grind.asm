@@ -1917,20 +1917,20 @@ uptime:
  ret
      f04:	8082                	ret
 
-0000000000000f06 <kill_sys>:
-.global kill_sys
-kill_sys:
- li a7, SYS_kill_sys
+0000000000000f06 <kill_system>:
+.global kill_system
+kill_system:
+ li a7, SYS_kill_system
      f06:	48d9                	li	a7,22
  ecall
      f08:	00000073          	ecall
  ret
      f0c:	8082                	ret
 
-0000000000000f0e <pause_sys>:
-.global pause_sys
-pause_sys:
- li a7, SYS_pause_sys
+0000000000000f0e <pause_system>:
+.global pause_system
+pause_system:
+ li a7, SYS_pause_system
      f0e:	48dd                	li	a7,23
  ecall
      f10:	00000073          	ecall

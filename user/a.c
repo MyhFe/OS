@@ -44,7 +44,7 @@ void kill_system_dem(int interval, int loop_size) {
             printf("kill system %d/%d completed.\n", i, loop_size);
         }
         if (i == loop_size / 2) {
-            kill_sys();
+            kill_system();
         }
     }
     printf("\n");
@@ -57,7 +57,7 @@ void pause_system_dem(int interval, int pause_seconds, int loop_size) {
             printf("pause system %d/%d completed.\n", i, loop_size);
         }
         if (i == loop_size / 2) {
-            pause_sys(pause_seconds);
+            pause_system(pause_seconds);
         }
     }
     printf("\n");
@@ -99,7 +99,8 @@ void env_freq() {
 int
 main(int argc, char *argv[])
 {
-    env_large();
+     pause_system_dem(10, 10, 100);
+    // kill_system_dem(10, 100);
     print_stats();
 
 

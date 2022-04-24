@@ -9453,20 +9453,20 @@ uptime:
  ret
     58f0:	8082                	ret
 
-00000000000058f2 <kill_sys>:
-.global kill_sys
-kill_sys:
- li a7, SYS_kill_sys
+00000000000058f2 <kill_system>:
+.global kill_system
+kill_system:
+ li a7, SYS_kill_system
     58f2:	48d9                	li	a7,22
  ecall
     58f4:	00000073          	ecall
  ret
     58f8:	8082                	ret
 
-00000000000058fa <pause_sys>:
-.global pause_sys
-pause_sys:
- li a7, SYS_pause_sys
+00000000000058fa <pause_system>:
+.global pause_system
+pause_system:
+ li a7, SYS_pause_system
     58fa:	48dd                	li	a7,23
  ecall
     58fc:	00000073          	ecall

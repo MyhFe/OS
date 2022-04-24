@@ -90,20 +90,20 @@ sys_kill(void)
 }
 
 uint64
-sys_kill_sys(void)
+sys_kill_system(void)
 {
-  return kill_sys();
+  return kill_system();
 }
 
 
 uint64
-sys_pause_sys(void)
+sys_pause_system(void)
 {
   int time;
 
   if(argint(0, &time) < 0)
     return -1;
-  return pause_sys(time);
+  return pause_system(time);
 }
 
 
