@@ -146,15 +146,12 @@ scheduler(void)
           // to release its lock and then reacquire it
           // before jumping back to us.
           p->state = RUNNING;
-          int before_switch = ticks;
+          p->before_switch = ticks;
           c->proc = p;
           if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
             p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
           }
           swtch(&c->context, &p->context);
-          if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-            p->running_time = p->running_time + ticks - before_switch;
-          }
           // Process is done running for now.
           // It should have changed its p->state before coming back.
           c->proc = 0;
@@ -197,16 +194,13 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
-        int ticks_now = ticks;
+        p->before_switch = ticks;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
           p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
         }
         swtch(&c->context, &p->context);
-        if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          p->running_time = p->running_time + ticks - ticks_now;
-        }
         int t = ticks;
-        p->last_ticks =  t - ticks_now;
+        p->last_ticks =  t - p->before_switch;
         p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
         // printf("pid: %d start: %d end: %d last: %d mean: %d\n",p->pid,ticks_now,t,p->last_ticks,p->mean_ticks);
         // Process is done running for now.
@@ -249,17 +243,13 @@ scheduler(void)
         // to release its lock and then reacquire it
         // before jumping back to us.
         p->state = RUNNING;
-        int ticks_now = ticks;
+        p->before_switch = ticks;
         c->proc = p;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
           p->runnable_time = p->runnable_time + ticks - p->last_runnable_time;
         }
         swtch(&c->context, &p->context);
-        if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
-          int n =  p->running_time;
-          p->running_time = n + ticks - ticks_now;
         //  printf("running time: %d\n",n);
-        }
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
@@ -352,6 +342,7 @@ found:
   p->sleeping_time = 0;
   p->runnable_time = 0;
   p->running_time = 0;
+  p->before_switch = 0;
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     freeproc(p);
@@ -619,7 +610,9 @@ exit(int status)
 
   p->xstate = status;
   p->state = ZOMBIE;
-
+  if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
+    p->running_time = p->running_time + ticks - p->before_switch;
+  }
   release(&wait_lock);
 
   // Jump into the scheduler, never to return.
@@ -712,6 +705,9 @@ yield(void)
   struct proc *p = myproc();
   acquire(&p->lock);
   p->state = RUNNABLE;
+  if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
+    p->running_time = p->running_time + ticks - p->before_switch;
+  }
   p->last_runnable_time = ticks;
   sched();
   release(&p->lock);
@@ -758,6 +754,9 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
+  if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
+    p->running_time = p->running_time + ticks - p->before_switch;
+  }
   int sleep_start = ticks;
   sched();
   p->sleeping_time = ticks - sleep_start;
