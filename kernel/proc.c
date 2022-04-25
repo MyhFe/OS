@@ -208,7 +208,7 @@ scheduler(void)
         int t = ticks;
         p->last_ticks =  t - ticks_now;
         p->mean_ticks = ((10-rate)*p->mean_ticks+p->last_ticks*rate)/10;
-        printf("pid: %d start: %d end: %d last: %d mean: %d\n",p->pid,ticks_now,t,p->last_ticks,p->mean_ticks);
+        // printf("pid: %d start: %d end: %d last: %d mean: %d\n",p->pid,ticks_now,t,p->last_ticks,p->mean_ticks);
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
@@ -249,7 +249,6 @@ scheduler(void)
         // to release its lock and then reacquire it
         // before jumping back to us.
         p->state = RUNNING;
-        p->last_ticks = ticks;
         int ticks_now = ticks;
         c->proc = p;
         if ((p->pid!=proc[0].pid) && (p->pid!=proc[1].pid)) {
